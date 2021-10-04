@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+
+
+<fx:root type="ScrollPane" xmlns:fx="http://javafx.com/fxml/1"
+	xmlns="http://javafx.com/javafx/8" fitToWidth="true">
+	<content>
+		<AnchorPane>
+			<GridPane AnchorPane.topAnchor="2.0"
+				AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0"
+				AnchorPane.leftAnchor="0.0" fx:id="gridPane">
+				<columnConstraints>
+					<ColumnConstraints percentWidth="24.0" />
+					<ColumnConstraints percentWidth="1.0" />
+					<ColumnConstraints percentWidth="15.0" />
+					<ColumnConstraints percentWidth="15.0" />
+					<ColumnConstraints percentWidth="15.0" />
+					<ColumnConstraints percentWidth="15.0" />
+					<ColumnConstraints percentWidth="15.0" />
+				</columnConstraints>
+				<rowConstraints>
+					<RowConstraints prefHeight="15.0" />
+					<RowConstraints prefHeight="15.0" />
+					<RowConstraints prefHeight="15.0" />
+					<RowConstraints prefHeight="0.0" />
+				</rowConstraints>
+				<children>
+					<AnchorPane GridPane.columnIndex="0"
+						GridPane.rowIndex="0" GridPane.columnSpan="1" GridPane.rowSpan="3">
+						<Label alignment="CENTER" fx:id="date"
+							AnchorPane.rightAnchor="0" AnchorPane.leftAnchor="0"
+							AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" />
+					</AnchorPane>
+					<Separator orientation="HORIZONTAL"
+						GridPane.columnIndex="0" GridPane.rowIndex="3"
+						GridPane.columnSpan="7" GridPane.rowSpan="1" />
+				</children>
+			</GridPane>
+		</AnchorPane>
+	</content>
+</fx:root>

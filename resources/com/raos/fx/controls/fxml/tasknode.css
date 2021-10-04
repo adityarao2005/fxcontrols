@@ -1,0 +1,11 @@
+/*
+ * Empty Stylesheet file.
+ */
+
+.taskNode {
+	-fx-background-radius: 30;
+	-fx-background-color: skyblue;
+	-fx-border-radius: 30;
+	-fx-border-color: black;
+	
+}

@@ -63,19 +63,19 @@ public class SchedulerSkin extends FXRootSkinBase<Scheduler, ScrollPane> {
 		IntegerProperty row = new SimpleIntegerProperty(0);
 		List<Task> added = new LinkedList<>();
 		tasks.stream().forEach((Task task) -> {
-			if (!Objects.requireNonNull(task).isFullday()) {
+			if (!Objects.requireNonNull(task).getOccurance().isFullDay()) {
 				if (task instanceof SubTask) {
 					throw new UnsupportedOperationException("Subtasks are not the main tasks");
 				}
-				if (added.stream().anyMatch(task::intersectsWith)) {
+				if (added.stream().map(Task::getOccurance).anyMatch(task.getOccurance()::intersectsWith)) {
 					column.set(column.add(1).get());
-					System.out.println(column);
 				}
 				added.add(task);
 
 				Node node = task.toNode(this);
-				gridPane.add(node, column.get(), indeces.get(task.getFrom()).getKey(), 1,
-						(indeces.get(task.getTo())).getKey() - indeces.get(task.getFrom()).getKey());
+				gridPane.add(node, column.get(), indeces.get(task.getOccurance().getStartTime()).getKey(), 1,
+						indeces.get(task.getOccurance().getEndTime()).getKey()
+								- indeces.get(task.getOccurance().getStartTime()).getKey());
 			} else {
 				Node node = task.toNode(this);
 				gridPane.add(node, 1, row.get(), gridPane.getColumnConstraints().size() - 1, 1);
@@ -87,15 +87,15 @@ public class SchedulerSkin extends FXRootSkinBase<Scheduler, ScrollPane> {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		indeces = FXCollections.observableHashMap();
-		int factor = 60 / 5;
+		int factor = 60;
 		for (int i = 0; i < 24; i++) {
 			String time = converter.toString(LocalTime.of(i, 0));
 			IntStream.range(0, factor).forEach(e -> {
-				indeces.put(converter.fromString(time).plusMinutes(e * 5),
+				indeces.put(converter.fromString(time).plusMinutes(e * (60 / factor)),
 						new Pair<>(gridPane.getRowConstraints().size(), Double.valueOf(
 								gridPane.getRowConstraints().stream().mapToDouble(RowConstraints::getPrefHeight).sum())
 								.intValue()));
-				gridPane.getRowConstraints().add(RowConstraintsBuilder.create().prefHeight(20).build());
+				gridPane.getRowConstraints().add(RowConstraintsBuilder.create().prefHeight(240 / factor).build());
 			});
 			AnchorPane anchorPane = new AnchorPane();
 			Label label = new Label(time);

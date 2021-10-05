@@ -119,16 +119,8 @@ public class Scheduler extends Control {
 		private static final ObservableList<Task> tasks = FXCollections
 				.synchronizedObservableList(FXCollections.observableArrayList());
 
-		private static boolean isBetween(LocalDate current, LocalDate start, LocalDate end) {
-			return (!current.isBefore(start)) && (!current.isAfter(end));
-		}
-
 		private static ReadOnlyListProperty<Task> taskFactory(LocalDate date) {
-			System.out.println(date);
-			return new ReadOnlyListWrapper<Task>(MemoryContainer.class, "tasks", tasks.stream().filter(e -> {
-				System.out.println(isBetween(date, e.getStart(), e.getEnd()));
-				return isBetween(date, e.getStart(), e.getEnd());
-			}).collect(FXCollections::observableArrayList, Collection::add, Collection::addAll)).getReadOnlyProperty();
+			return new ReadOnlyListWrapper<Task>(MemoryContainer.class, "tasks", tasks.stream().filter(e -> e.getOccurance().isAvailable(date)).collect(FXCollections::observableArrayList, Collection::add, Collection::addAll)).getReadOnlyProperty();
 		}
 
 		private static boolean taskModFactory(Change<Task> change) {

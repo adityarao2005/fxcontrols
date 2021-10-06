@@ -5,26 +5,26 @@ import java.util.List;
 
 import com.raos.fx.controls.models.occurance.Occurance;
 
-import javafx.util.Builder;
-
-public class TaskBuilder implements Builder<Task> {
+public class TaskBuilder<T extends Task> implements Builder<T> {
 	private String name, description;
 	private Occurance occurance;
 	private Priority priority;
 	private List<SubTask> subTasks;
+	protected final Class<T> clazz;
 	
-	private TaskBuilder() {
+	protected TaskBuilder(Class<T> clazz) {
+		this.clazz = clazz;
 	}
 	
-	public TaskBuilder name(String name) { this.name = name; return this; }
-	public TaskBuilder description(String description) {this.description = description;return this;}
-	public TaskBuilder occurance(Occurance occurance) {this.occurance = occurance; return this;}
-	public TaskBuilder priority(Priority priority) { this.priority = priority; return this;}
-	public TaskBuilder subTasks(SubTask...subTasks) { this.subTasks = Arrays.asList(subTasks); return this;}
+	public TaskBuilder<T> name(String name) { this.name = name; return this; }
+	public TaskBuilder<T> description(String description) {this.description = description;return this;}
+	public TaskBuilder<T> occurance(Occurance occurance) {this.occurance = occurance; return this;}
+	public TaskBuilder<T> priority(Priority priority) { this.priority = priority; return this;}
+	public TaskBuilder<T> subTasks(SubTask...subTasks) { this.subTasks = Arrays.asList(subTasks); return this;}
 
 	@Override
-	public Task build() {
-		Task task = new Task();
+	public T build() {
+		T task = this.construct(clazz);
 		if (name != null) {
 			task.setName(name);
 		}
@@ -43,8 +43,8 @@ public class TaskBuilder implements Builder<Task> {
 		return task;
 	}
 	
-	public static TaskBuilder create() {
-		return new TaskBuilder();
+	public static TaskBuilder<? extends Task> create() {
+		return new TaskBuilder<>(Task.class);
 	}
 
 }

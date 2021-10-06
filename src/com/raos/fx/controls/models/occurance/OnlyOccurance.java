@@ -2,6 +2,7 @@ package com.raos.fx.controls.models.occurance;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Map;
 import java.util.Objects;
 
 public final class OnlyOccurance extends Occurance {
@@ -63,4 +64,10 @@ public final class OnlyOccurance extends Occurance {
 		return this.date.equals(date);
 	}
 
+	@Override
+	public Map<String, Object> transform(Map<String, Object> t) {
+		Map<String, Object> map = super.transform(t);
+		map.put("Date", date);
+		return map;
+	}
 }

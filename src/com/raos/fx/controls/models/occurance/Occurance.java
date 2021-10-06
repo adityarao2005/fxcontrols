@@ -3,11 +3,22 @@ package com.raos.fx.controls.models.occurance;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
-public abstract class Occurance {
+import com.raos.fx.controls.models.Transformable;
+
+import javafx.util.converter.LocalTimeStringConverter;
+
+public abstract class Occurance implements Transformable<Map<String, Object>> {
 	public static final LocalTime MIN = LocalTime.MIN, MAX = LocalTime.MAX.truncatedTo(ChronoUnit.MINUTES);
+	private static final LocalTimeStringConverter converter = new LocalTimeStringConverter(FormatStyle.SHORT,
+			Locale.CANADA);
 	private LocalTime startTime, endTime;
 	private LocalTime reminderTime;
 	
@@ -77,6 +88,16 @@ public abstract class Occurance {
 	}
 
 	public abstract boolean isAvailable(LocalDate date);
+	
+	@Override
+	public Map<String, Object> transform(Map<String, Object> t) {
+		Map<String, Object> map = Optional.ofNullable(t).orElseGet(HashMap::new);
+		map.put("Name", "Occurance");
+		map.put("Start Time", converter.toString(startTime));
+		map.put("End Time", converter.toString(endTime));
+		map.put("Reminder Time", converter.toString(reminderTime));
+		return map;
+	}
 }
 
 

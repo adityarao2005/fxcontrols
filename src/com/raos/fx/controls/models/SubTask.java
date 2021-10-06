@@ -7,7 +7,7 @@ public class SubTask extends Task {
 		return parentTask;
 	}
 
-	public final void setParentTask(Task parentTask) {
+	final void setParentTask(Task parentTask) {
 		this.parentTask = parentTask;
 	}
 }

@@ -1,6 +1,10 @@
 package com.raos.fx.controls.models;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.raos.fx.controls.models.occurance.Occurance;
 import com.raos.fx.controls.skin.SchedulerSkin;
@@ -35,7 +39,7 @@ import javafx.collections.FXCollections;
  *
  * @author Raos
  */
-public class Task {
+public class Task implements Transformable<Map<String, Object>> {
 	private String name, description;
 	private Occurance occurance;
 	private Priority priority;
@@ -61,7 +65,7 @@ public class Task {
 			return "subTasks";
 		}
 	};
-	
+
 	public Task() {
 	}
 
@@ -103,5 +107,17 @@ public class Task {
 
 	public final TaskNode toNode(SchedulerSkin scheduler) {
 		return new TaskNode(scheduler, this);
+	}
+
+	@Override
+	public Map<String, Object> transform(
+			Map<String, Object> list) {
+		Map<String, Object> map = Optional.ofNullable(list).orElseGet(HashMap::new);
+		map.put("Name", name);
+		map.put("Description", description);
+		map.put("Priority", priority);
+		map.put("Occurance", occurance.transform(null));
+		map.put("Sub Tasks", subTasks.stream().map(e -> e.transform(null)).collect(Collectors.toList()));
+		return map;
 	}
 }

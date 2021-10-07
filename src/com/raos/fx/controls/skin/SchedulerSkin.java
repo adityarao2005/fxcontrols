@@ -26,15 +26,12 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
-import javafx.scene.control.SeparatorBuilder;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.RowConstraintsBuilder;
 import javafx.util.Pair;
 import javafx.util.converter.LocalTimeStringConverter;
 
-@SuppressWarnings("deprecation")
 public class SchedulerSkin extends FXRootSkinBase<Scheduler, ScrollPane> {
 	@FXML
 	private GridPane gridPane;
@@ -47,7 +44,7 @@ public class SchedulerSkin extends FXRootSkinBase<Scheduler, ScrollPane> {
 	public SchedulerSkin(Scheduler e) {
 		super(e, SchedulerSkin.class.getResource("/com/raos/fx/controls/fxml/scheduler.fxml"), ScrollPane::new);
 		this.getSkinnable().currentLocalDate().addListener((obs, oldv, newv) -> {
-			this.displayTasks(this.getSkinnable().getTaskFactory().call(newv));
+			this.displayTasks(Scheduler.getTaskFactory().call(newv));
 		});
 		this.getSkinnable().setCurrentLocalDate(LocalDate.now());
 	}
@@ -95,7 +92,7 @@ public class SchedulerSkin extends FXRootSkinBase<Scheduler, ScrollPane> {
 						new Pair<>(gridPane.getRowConstraints().size(), Double.valueOf(
 								gridPane.getRowConstraints().stream().mapToDouble(RowConstraints::getPrefHeight).sum())
 								.intValue()));
-				gridPane.getRowConstraints().add(RowConstraintsBuilder.create().prefHeight(240 / factor).build());
+				gridPane.getRowConstraints().add(new RowConstraints(240 / factor));
 			});
 			AnchorPane anchorPane = new AnchorPane();
 			Label label = new Label(time);
@@ -107,20 +104,17 @@ public class SchedulerSkin extends FXRootSkinBase<Scheduler, ScrollPane> {
 			anchorPane.getChildren().add(label);
 			gridPane.add(anchorPane, 0, i * (factor + 1) + 4, 1, factor);
 
-			Separator separator = SeparatorBuilder.create().orientation(Orientation.HORIZONTAL).build();
+			gridPane.getRowConstraints().add(new RowConstraints());
 
-			RowConstraints rcons = RowConstraintsBuilder.create().prefHeight(0).build();
-			gridPane.getRowConstraints().add(rcons);
-
-			gridPane.add(separator, 0, i * (factor + 1) + factor + 4, gridPane.getColumnConstraints().size(), 1);
+			gridPane.add(new Separator(Orientation.HORIZONTAL), 0, i * (factor + 1) + factor + 4,
+					gridPane.getColumnConstraints().size(), 1);
 
 		}
 		indeces.put(LocalTime.MAX, new Pair<>(gridPane.getRowConstraints().size(),
 				Double.valueOf(gridPane.getRowConstraints().stream().mapToDouble(RowConstraints::getPrefHeight).sum())
 						.intValue()));
 
-		Separator vseparator = SeparatorBuilder.create().orientation(Orientation.VERTICAL).build();
-		gridPane.add(vseparator, 1, 0, 1, gridPane.getRowConstraints().size());
+		gridPane.add(new Separator(Orientation.VERTICAL), 1, 0, 1, gridPane.getRowConstraints().size());
 	}
 
 }

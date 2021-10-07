@@ -45,33 +45,33 @@ public class Scheduler extends Control {
 	}
 
 	// taskFactory and taskModFactory
-	private final ObjectProperty<Callback<LocalDate, ReadOnlyListProperty<Task>>> taskFactory = new SimpleObjectProperty<>(
-			this, "taskFactory", DEFAULT_TASK_FACTORY);
+	private final static ObjectProperty<Callback<LocalDate, ReadOnlyListProperty<Task>>> taskFactory = new SimpleObjectProperty<>(
+			Scheduler.class, "taskFactory", DEFAULT_TASK_FACTORY);
 
-	private final ObjectProperty<Callback<Change<Task>, Boolean>> taskModFactory = new SimpleObjectProperty<>(this,
-			"taskModFactory", DEFAULT_TASK_MOD_FACTORY);
+	private final static ObjectProperty<Callback<Change<Task>, Boolean>> taskModFactory = new SimpleObjectProperty<>(
+			Scheduler.class, "taskModFactory", DEFAULT_TASK_MOD_FACTORY);
 
-	public Callback<LocalDate, ReadOnlyListProperty<Task>> getTaskFactory() {
+	public static Callback<LocalDate, ReadOnlyListProperty<Task>> getTaskFactory() {
 		return taskFactory.get();
 	}
 
-	public void setTaskFactory(Callback<LocalDate, ReadOnlyListProperty<Task>> value) {
+	public static void setTaskFactory(Callback<LocalDate, ReadOnlyListProperty<Task>> value) {
 		taskFactory.set(value);
 	}
 
-	public ObjectProperty<Callback<LocalDate, ReadOnlyListProperty<Task>>> taskFactoryProperty() {
+	public static ObjectProperty<Callback<LocalDate, ReadOnlyListProperty<Task>>> taskFactoryProperty() {
 		return taskFactory;
 	}
 
-	public Callback<Change<Task>, Boolean> getTaskModFactory() {
+	public static Callback<Change<Task>, Boolean> getTaskModFactory() {
 		return taskModFactory.get();
 	}
 
-	public void setTaskModFactory(Callback<Change<Task>, Boolean> value) {
+	public static void setTaskModFactory(Callback<Change<Task>, Boolean> value) {
 		taskModFactory.set(value);
 	}
 
-	public ObjectProperty<Callback<Change<Task>, Boolean>> taskModFactoryProperty() {
+	public static ObjectProperty<Callback<Change<Task>, Boolean>> taskModFactoryProperty() {
 		return taskModFactory;
 	}
 
@@ -120,7 +120,10 @@ public class Scheduler extends Control {
 				.synchronizedObservableList(FXCollections.observableArrayList());
 
 		private static ReadOnlyListProperty<Task> taskFactory(LocalDate date) {
-			return new ReadOnlyListWrapper<Task>(MemoryContainer.class, "tasks", tasks.stream().filter(e -> e.getOccurance().isAvailable(date)).collect(FXCollections::observableArrayList, Collection::add, Collection::addAll)).getReadOnlyProperty();
+			return new ReadOnlyListWrapper<Task>(MemoryContainer.class, "tasks",
+					tasks.stream().filter(e -> e.getOccurance().isAvailable(date))
+							.collect(FXCollections::observableArrayList, Collection::add, Collection::addAll))
+									.getReadOnlyProperty();
 		}
 
 		private static boolean taskModFactory(Change<Task> change) {

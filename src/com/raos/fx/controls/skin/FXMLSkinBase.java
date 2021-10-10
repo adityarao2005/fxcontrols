@@ -17,16 +17,28 @@ import javafx.scene.control.Control;
 import javafx.util.Callback;
 
 /**
- *
+ * Skin base for all controls adapting FXML without an fx:root
  * @author Raos
- * @param <E>
+ * @param <E> - The control that should be returned from the FXML file
  */
 public abstract class FXMLSkinBase<E extends Control> extends SkinBase<E> implements Initializable {
 	
+	/**
+	 * Abstract constructor from a controller factory
+	 * @param factory
+	 */
 	protected FXMLSkinBase(Factory<E> factory) {
 		super(factory.e);
 	}
 	
+	/**
+	 * Creates the the FXML Skin from the Control and URL of .fxml
+	 * @param <F> - the Control class
+	 * @param <E> - the Skin base class
+	 * @param f - the Control
+	 * @param fxml - the URL of the fxml file
+	 * @return
+	 */
 	public static <F extends Control, E extends FXMLSkinBase<F>> E create(F f, URL fxml) {
 		Factory<F> factory = new Factory<>(f);
 		FXMLLoader fxmlLoader = new FXMLLoader(fxml);
@@ -41,11 +53,21 @@ public abstract class FXMLSkinBase<E extends Control> extends SkinBase<E> implem
 		}
 	}
 	
+	/**
+	 * constructing the skin
+	 * @param root - the root node of fxml
+	 */
 	final void construct(Node root) {
 		this.getChildren().add(root);
 	}
 	
-	protected static final class Factory<E> implements Callback<Class<?>, Object> {
+	/**
+	 * 
+	 * @author Raos
+	 *
+	 * @param <E> - the control class
+	 */
+	public static final class Factory<E> implements Callback<Class<?>, Object> {
 		private E e;
 
 		public Factory(E e) {
@@ -55,6 +77,7 @@ public abstract class FXMLSkinBase<E extends Control> extends SkinBase<E> implem
 		@Override
 		public Object call(Class<?> param) {
 			try {
+				// use reflection to get the class
 				return param.getDeclaredConstructor(Factory.class).newInstance(this);
 			} catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException ex) {
 				throw new RuntimeException(ex);

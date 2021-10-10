@@ -19,12 +19,19 @@ import javafx.scene.control.Control;
 
 /**
  *
+ * Skin base for all controls adapting FXML with an fx:root
  * @author Raos
- * @param <E>
- * @param <ROOT>
+ * @param <E> - the control class that this is the skin for
+ * @param <ROOT> - the root node class
  */
 public abstract class FXRootSkinBase<E extends Control, ROOT extends Node> extends SkinBase<E> implements Initializable {
 
+	/**
+	 * Constructs the FXRootSkinBase class
+	 * @param e - the control that the skin is for
+	 * @param fxml - the location of the fxml file
+	 * @param rootSupplier - the supplier of the root node object
+	 */
 	public FXRootSkinBase(E e, URL fxml, Supplier<ROOT> rootSupplier) {
 		super(e);
 		FXMLLoader loader = new FXMLLoader(fxml);

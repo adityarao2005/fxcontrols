@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
@@ -23,15 +22,23 @@ import javafx.util.Callback;
 import javafx.util.Pair;
 
 /**
- *
+ * A Scheduler that will recieve tasks from a source based on the date
+ * 
  * @author Raos
  */
 public class Scheduler extends Control {
-	// currentLocalDate
-	private final ObjectProperty<LocalDate> currentLocalDate = new SimpleObjectProperty<>(this, "currentLocalDate");
-	public static final Callback<LocalDate, ReadOnlyListProperty<Task>> DEFAULT_TASK_FACTORY = MemoryContainer::taskFactory;
+	/**
+	 * The default factory callback to modify tasks
+	 */
 	public static final Callback<Change<Task>, Boolean> DEFAULT_TASK_MOD_FACTORY = MemoryContainer::taskModFactory;
+	/**
+	 * The default factory callback to retrieve the tasks
+	 */
+	public static final Callback<LocalDate, ReadOnlyListProperty<Task>> DEFAULT_TASK_FACTORY = MemoryContainer::taskFactory;
 
+	/**
+	 * The current local date that is used for the Scheduler
+	 */
 	public final ObjectProperty<LocalDate> currentLocalDate() {
 		return currentLocalDate;
 	}
@@ -44,12 +51,14 @@ public class Scheduler extends Control {
 		this.currentLocalDate().set(currentLocalDate);
 	}
 
-	// taskFactory and taskModFactory
-	private final static ObjectProperty<Callback<LocalDate, ReadOnlyListProperty<Task>>> taskFactory = new SimpleObjectProperty<>(
-			Scheduler.class, "taskFactory", DEFAULT_TASK_FACTORY);
+	private final ObjectProperty<LocalDate> currentLocalDate = new SimpleObjectProperty<>(this, "currentLocalDate");
 
-	private final static ObjectProperty<Callback<Change<Task>, Boolean>> taskModFactory = new SimpleObjectProperty<>(
-			Scheduler.class, "taskModFactory", DEFAULT_TASK_MOD_FACTORY);
+	/**
+	 * The current factory callback to retrieve the tasks
+	 */
+	public static ObjectProperty<Callback<LocalDate, ReadOnlyListProperty<Task>>> taskFactoryProperty() {
+		return taskFactory;
+	}
 
 	public static Callback<LocalDate, ReadOnlyListProperty<Task>> getTaskFactory() {
 		return taskFactory.get();
@@ -59,8 +68,14 @@ public class Scheduler extends Control {
 		taskFactory.set(value);
 	}
 
-	public static ObjectProperty<Callback<LocalDate, ReadOnlyListProperty<Task>>> taskFactoryProperty() {
-		return taskFactory;
+	private final static ObjectProperty<Callback<LocalDate, ReadOnlyListProperty<Task>>> taskFactory = new SimpleObjectProperty<>(
+			Scheduler.class, "taskFactory", DEFAULT_TASK_FACTORY);
+
+	/**
+	 * The current factory callback to modify tasks
+	 */
+	public static ObjectProperty<Callback<Change<Task>, Boolean>> taskModFactoryProperty() {
+		return taskModFactory;
 	}
 
 	public static Callback<Change<Task>, Boolean> getTaskModFactory() {
@@ -71,11 +86,39 @@ public class Scheduler extends Control {
 		taskModFactory.set(value);
 	}
 
-	public static ObjectProperty<Callback<Change<Task>, Boolean>> taskModFactoryProperty() {
-		return taskModFactory;
+	private final static ObjectProperty<Callback<Change<Task>, Boolean>> taskModFactory = new SimpleObjectProperty<>(
+			Scheduler.class, "taskModFactory", DEFAULT_TASK_MOD_FACTORY);
+
+	/**
+	 * The constructor for the Scheduler object
+	 */
+	public Scheduler() {
+
 	}
 
-	// onTaskSelected
+	/**
+	 * Creates the default skin as {@link SchedulerSkin}
+	 */
+	@Override
+	protected Skin<?> createDefaultSkin() {
+		return new SchedulerSkin(this);
+	}
+
+	/**
+	 * The event handler for the selection of the tasks
+	 */
+	public final ObjectProperty<EventHandler<TaskSelectedEvent>> onTaskSelectedProperty() {
+		return this.onTaskSelected;
+	}
+
+	public final EventHandler<TaskSelectedEvent> getOnTaskSelected() {
+		return this.onTaskSelectedProperty().get();
+	}
+
+	public final void setOnTaskSelected(final EventHandler<TaskSelectedEvent> onTaskSelected) {
+		this.onTaskSelectedProperty().set(onTaskSelected);
+	}
+
 	private final ObjectProperty<EventHandler<TaskSelectedEvent>> onTaskSelected = new ObjectPropertyBase<EventHandler<TaskSelectedEvent>>() {
 
 		protected void invalidated() {
@@ -93,45 +136,35 @@ public class Scheduler extends Control {
 		}
 	};
 
-	public Scheduler() {
-
-	}
-
-	@Override
-	protected Skin<?> createDefaultSkin() {
-		return new SchedulerSkin(this);
-	}
-
-	public final ObjectProperty<EventHandler<TaskSelectedEvent>> onTaskSelectedProperty() {
-		return this.onTaskSelected;
-	}
-
-	public final EventHandler<TaskSelectedEvent> getOnTaskSelected() {
-		return this.onTaskSelectedProperty().get();
-	}
-
-	public final void setOnTaskSelected(final EventHandler<TaskSelectedEvent> onTaskSelected) {
-		this.onTaskSelectedProperty().set(onTaskSelected);
-	}
-
 	private static class MemoryContainer {
 
+		// Total amount tasks
 		private static final ObservableList<Task> tasks = FXCollections
 				.synchronizedObservableList(FXCollections.observableArrayList());
 
+		// The default task factory
 		private static ReadOnlyListProperty<Task> taskFactory(LocalDate date) {
+			// Readonly wrapper of the tasks
 			return new ReadOnlyListWrapper<Task>(MemoryContainer.class, "tasks",
+					// filtering the tasks to the date
 					tasks.stream().filter(e -> e.getOccurance().isAvailable(date))
-							.collect(FXCollections::observableArrayList, Collection::add, Collection::addAll))
-									.getReadOnlyProperty();
+						// collecting the stream to an observable array list from FXCollections
+						.collect(FXCollections::observableArrayList, Collection::add, Collection::addAll))
+							// getting the readonly property from the wrapper
+							.getReadOnlyProperty();
 		}
 
+		// The default task modification factory
 		private static boolean taskModFactory(Change<Task> change) {
+			// switch case of the change event
 			switch (change.getChanged()) {
+			// adds the added list to the total tasks
 			case ADDED:
-				return tasks.addAll(change.added().stream().collect(Collectors.toList()));
+				return tasks.addAll(change.added());
+			// removes the removed list from the change event from the total tasks
 			case REMOVED:
 				return tasks.removeAll(change.removed());
+			// updates the old value to the new value
 			case UPDATED:
 				boolean b = true;
 				try {
@@ -145,13 +178,26 @@ public class Scheduler extends Control {
 		}
 	}
 
+	/**
+	 * The change class that can hold changed items for the scheduler
+	 * @author Raos
+	 *
+	 * @param <E> - Changed class
+	 */
 	public static abstract class Change<E> {
 
 		private List<E> added;
 		private List<E> removed;
 		private Pair<E, E> updated;
 
+		/**
+		 * 
+		 * @param <E> - Changed class
+		 * @param added - List of Elements to be added to Scheduler tasks
+		 * @return the change object
+		 */
 		public static <E> Change<E> listAddedChange(List<E> added) {
+			// Anonymously extend the Change class
 			Change<E> change = new Change<E>() {
 
 				@Override
@@ -160,11 +206,13 @@ public class Scheduler extends Control {
 				}
 
 			};
+			//set the added as an unmodifiable list
 			change.added = Collections.unmodifiableList(added);
 			return change;
 		}
 
 		public static <E> Change<E> listRemovedChange(List<E> removed) {
+			// Anonymously extend the Change class
 			Change<E> change = new Change<E>() {
 
 				@Override
@@ -173,11 +221,13 @@ public class Scheduler extends Control {
 				}
 
 			};
+			//set the removed as an unmodifiable list
 			change.removed = Collections.unmodifiableList(removed);
 			return change;
 		}
 
 		public static <E> Change<E> listUpdatedChange(Pair<E, E> updated) {
+			// Anonymously extend the Change class
 			Change<E> change = new Change<E>() {
 
 				@Override
@@ -186,10 +236,14 @@ public class Scheduler extends Control {
 				}
 
 			};
+			// set the updated
 			change.updated = updated;
 			return change;
 		}
 
+		/**
+		 * @return the list of all the added tasks
+		 */
 		public List<E> added() {
 			if (added == null) {
 				return added = Collections.emptyList();
@@ -197,6 +251,9 @@ public class Scheduler extends Control {
 			return added;
 		}
 
+		/**
+		 * @return the list of all the remove tasks
+		 */
 		public List<E> removed() {
 			if (removed == null) {
 				return removed = Collections.emptyList();
@@ -204,12 +261,23 @@ public class Scheduler extends Control {
 			return removed;
 		}
 
+		/**
+		 * @return updated tasks
+		 */
 		public Pair<E, E> updated() {
 			return updated;
 		}
 
+		/**
+		 * @return The Change Event: Updated, Added, or Removed
+		 */
 		public abstract ChangeEvent getChanged();
 
+		/**
+		 * The Change event
+		 * @author Raos
+		 *
+		 */
 		public static enum ChangeEvent {
 			ADDED, REMOVED, UPDATED
 		}

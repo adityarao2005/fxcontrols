@@ -32,6 +32,12 @@ import javafx.scene.layout.RowConstraints;
 import javafx.util.Pair;
 import javafx.util.converter.LocalTimeStringConverter;
 
+/**
+ * The Skin for the Scheduler Control
+ * 
+ * @author Raos
+ *
+ */
 public class SchedulerSkin extends FXRootSkinBase<Scheduler, ScrollPane> {
 	@FXML
 	private GridPane gridPane;
@@ -41,25 +47,45 @@ public class SchedulerSkin extends FXRootSkinBase<Scheduler, ScrollPane> {
 			Locale.CANADA);
 	private Map<LocalTime, Pair<Integer, Integer>> indeces;
 
+	/**
+	 * Constructs the SchedulerSkin class
+	 * 
+	 * @param e - the scheduler that this class is the skin of
+	 */
 	public SchedulerSkin(Scheduler e) {
+		// Filling in super types
 		super(e, SchedulerSkin.class.getResource("/com/raos/fx/controls/fxml/scheduler.fxml"), ScrollPane::new);
+
 		this.getSkinnable().currentLocalDate().addListener((obs, oldv, newv) -> {
 			this.displayTasks(Scheduler.getTaskFactory().call(newv));
 		});
 		this.getSkinnable().setCurrentLocalDate(LocalDate.now());
 	}
 
+	/**
+	 * Gets the row and layout value at the time
+	 * 
+	 * @param lt - the time/index
+	 * @return the pair of row number and layout value
+	 */
 	public Pair<Integer, Integer> getAtIndex(LocalTime lt) {
 		return indeces.get(lt);
 	}
 
+	// Displays the tasks
 	private void displayTasks(List<Task> tasks) {
+		// Removes all tasks
 		gridPane.getChildren().removeIf(e -> e.getStyleClass().contains("task"));
+		// sets the date
 		date.setText(this.getSkinnable().getCurrentLocalDate().toString());
+		// row and column are initialized
 		IntegerProperty column = new SimpleIntegerProperty(2);
 		IntegerProperty row = new SimpleIntegerProperty(0);
+		// the tasks are added to the scheduler and those which times conflict are sent
+		// to the next row
 		List<Task> added = new LinkedList<>();
 		tasks.stream().forEach((Task task) -> {
+			// Full day tasks are rendered differently
 			if (!Objects.requireNonNull(task).getOccurance().isFullDay()) {
 				if (task instanceof SubTask) {
 					throw new UnsupportedOperationException("Subtasks are not the main tasks");
@@ -69,6 +95,7 @@ public class SchedulerSkin extends FXRootSkinBase<Scheduler, ScrollPane> {
 				}
 				added.add(task);
 
+				// Adds the task to the scheduler
 				Node node = task.toNode(this);
 				gridPane.add(node, column.get(), indeces.get(task.getOccurance().getStartTime()).getKey(), 1,
 						indeces.get(task.getOccurance().getEndTime()).getKey()
@@ -83,10 +110,15 @@ public class SchedulerSkin extends FXRootSkinBase<Scheduler, ScrollPane> {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		// creates indeces
 		indeces = FXCollections.observableHashMap();
+		// the factor is made for testing in the earlier stage of construction of this
+		// skin to organize the time difference and length of each minute
 		int factor = 60;
 		for (int i = 0; i < 24; i++) {
+			// converting time to string
 			String time = converter.toString(LocalTime.of(i, 0));
+			// foreach minute add the index to the indeces
 			IntStream.range(0, factor).forEach(e -> {
 				indeces.put(converter.fromString(time).plusMinutes(e * (60 / factor)),
 						new Pair<>(gridPane.getRowConstraints().size(), Double.valueOf(
@@ -94,6 +126,7 @@ public class SchedulerSkin extends FXRootSkinBase<Scheduler, ScrollPane> {
 								.intValue()));
 				gridPane.getRowConstraints().add(new RowConstraints(240 / factor));
 			});
+			// create the label for time
 			AnchorPane anchorPane = new AnchorPane();
 			Label label = new Label(time);
 			label.setAlignment(Pos.CENTER);
@@ -106,13 +139,11 @@ public class SchedulerSkin extends FXRootSkinBase<Scheduler, ScrollPane> {
 
 			gridPane.getRowConstraints().add(new RowConstraints());
 
+			// Add a separator at the end of the hour in the 
 			gridPane.add(new Separator(Orientation.HORIZONTAL), 0, i * (factor + 1) + factor + 4,
 					gridPane.getColumnConstraints().size(), 1);
 
 		}
-		indeces.put(LocalTime.MAX, new Pair<>(gridPane.getRowConstraints().size(),
-				Double.valueOf(gridPane.getRowConstraints().stream().mapToDouble(RowConstraints::getPrefHeight).sum())
-						.intValue()));
 
 		gridPane.add(new Separator(Orientation.VERTICAL), 1, 0, 1, gridPane.getRowConstraints().size());
 	}

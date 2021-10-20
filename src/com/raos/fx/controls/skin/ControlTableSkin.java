@@ -69,7 +69,6 @@ public class ControlTableSkin<E extends Control, V> extends FXRootSkinBase<Contr
 	@FXML
 	public void handleRowSubtracted(ActionEvent event) {
 		int index = listView.getSelectionModel().getSelectedIndex();
-		System.out.println(index);
 		if (index != -1) {
 			listView.getItems().remove(index);
 		}
@@ -78,7 +77,6 @@ public class ControlTableSkin<E extends Control, V> extends FXRootSkinBase<Contr
 	@FXML
 	public void handleRowAdded(ActionEvent event) {
 		listView.getItems().add(this.getSkinnable().getItemFactory().get());
-		System.out.println(listView.getItems());
 	}
 
 	public ObjectProperty<ObservableList<V>> getRawList() {

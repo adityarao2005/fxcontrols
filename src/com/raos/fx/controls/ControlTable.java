@@ -27,6 +27,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 
 public class ControlTable<E extends Control, V> extends Control {
+	
+	public ControlTable() {
+		getStyleClass().add("control-table");
+	}
 
 	@Override
 	protected Skin<?> createDefaultSkin() {

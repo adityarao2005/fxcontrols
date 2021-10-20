@@ -35,7 +35,7 @@ public final class DailyOccurance extends Occurance {
 	 */
 	public static DailyOccurance dailyOccurance(LocalTime startTime, LocalTime endTime, LocalDate startDay,
 			LocalDate endDay) {
-		return dailyOccurance(startTime, endTime, startDay, endDay, Collections.emptyList());
+		return dailyOccurance(startTime, endTime, startDay, endDay, Collections.emptyList(), LocalTime.MIN);
 	}
 
 	/**
@@ -45,16 +45,18 @@ public final class DailyOccurance extends Occurance {
 	 * @param startDay - the start day
 	 * @param endDay - the end day
 	 * @param excludes - the days excluded
+	 * @param reminderTime- the reminder time
 	 * @return an instance of the class DailyOccurance
 	 */
 	public static DailyOccurance dailyOccurance(LocalTime startTime, LocalTime endTime, LocalDate startDay,
-			LocalDate endDay, Collection<LocalDate> excludes) {
+			LocalDate endDay, Collection<LocalDate> excludes, LocalTime reminderTime) {
 		DailyOccurance occurance = new DailyOccurance();
 		occurance.setStartTime(startTime);
 		occurance.setEndTime(endTime);
 		occurance.setStartDay(startDay);
 		occurance.setEndDay(endDay);
 		occurance.setExcludes(excludes);
+		occurance.setReminderTime(reminderTime);
 		return occurance;
 	}
 

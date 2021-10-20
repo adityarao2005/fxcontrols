@@ -43,7 +43,7 @@ public final class YearlyOccurance extends Occurance {
 	 */
 	public static YearlyOccurance yearlyOccurance(LocalTime startTime, LocalTime endTime, Collection<MonthDay> days,
 			LocalDate start, LocalDate end) {
-		return yearlyOccurance(startTime, endTime, days, start, end, Collections.emptyList());
+		return yearlyOccurance(startTime, endTime, days, start, end, Collections.emptyList(), LocalTime.MIN);
 	}
 
 	/**
@@ -54,10 +54,11 @@ public final class YearlyOccurance extends Occurance {
 	 * @param start - the start day
 	 * @param end - the end day
 	 * @param exclude - the excluded days
+	 * @param reminderTime - the reminder time
 	 * @return an instance of YearlyOccurance
 	 */
 	public static YearlyOccurance yearlyOccurance(LocalTime startTime, LocalTime endTime, Collection<MonthDay> days,
-			LocalDate start, LocalDate end, Collection<LocalDate> exclude) {
+			LocalDate start, LocalDate end, Collection<LocalDate> exclude, LocalTime reminderTime) {
 		YearlyOccurance occurance = new YearlyOccurance();
 		occurance.setDays(days);
 		occurance.setEndDay(end);
@@ -65,6 +66,7 @@ public final class YearlyOccurance extends Occurance {
 		occurance.setExcludes(exclude);
 		occurance.setStartDay(start);
 		occurance.setStartTime(startTime);
+		occurance.setReminderTime(reminderTime);
 		return occurance;
 	}
 

@@ -45,7 +45,7 @@ public final class WeeklyOccurance extends Occurance {
 	 */
 	public static WeeklyOccurance weeklyOccurance(LocalTime startTime, LocalTime endTime, EnumSet<DayOfWeek> daysOfWeek,
 			LocalDate start, LocalDate end) {
-		return weeklyOccurance(startTime, endTime, daysOfWeek, start, end, Collections.emptyList());
+		return weeklyOccurance(startTime, endTime, daysOfWeek, start, end, Collections.emptyList(), LocalTime.MIN);
 	}
 
 	/**
@@ -56,10 +56,11 @@ public final class WeeklyOccurance extends Occurance {
 	 * @param start - the start day
 	 * @param end - the end day
 	 * @param excludes - the excluded days
+	 * @param reminderTime - the reminder time
 	 * @return an instance of WeeklyOccurance
 	 */
 	public static WeeklyOccurance weeklyOccurance(LocalTime startTime, LocalTime endTime, EnumSet<DayOfWeek> daysOfWeek,
-			LocalDate start, LocalDate end, Collection<LocalDate> excludes) {
+			LocalDate start, LocalDate end, Collection<LocalDate> excludes, LocalTime reminderTime) {
 		WeeklyOccurance occurance = new WeeklyOccurance();
 		occurance.setStartTime(startTime);
 		occurance.setEndTime(endTime);
@@ -67,6 +68,7 @@ public final class WeeklyOccurance extends Occurance {
 		occurance.setEndDay(end);
 		occurance.setExcludes(excludes);
 		occurance.setDaysOfWeek(daysOfWeek);
+		occurance.setReminderTime(reminderTime);
 		return occurance;
 	}
 

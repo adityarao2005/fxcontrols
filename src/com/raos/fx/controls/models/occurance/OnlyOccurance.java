@@ -31,13 +31,30 @@ public final class OnlyOccurance extends Occurance {
 	 * @param startTime - the start time
 	 * @param endTime - the end time
 	 * @param date - the date
-	 * @return an instanc eof the OnlyOccurance object
+	 * @return an instance of the OnlyOccurance object
 	 */
 	public static OnlyOccurance onlyOccurance(LocalTime startTime, LocalTime endTime, LocalDate date) {
 		OnlyOccurance occurance = new OnlyOccurance();
 		occurance.setDate(date);
 		occurance.setEndTime(endTime);
 		occurance.setStartTime(startTime);
+		return occurance;
+	}
+	
+	/**
+	 * 
+	 * @param startTime - the start time
+	 * @param endTime - the end time
+	 * @param date - the date
+	 * @param reminderTime - the reminderTime
+	 * @return an instance of the OnlyOccurance object
+	 */
+	public static OnlyOccurance onlyOccurance(LocalTime startTime, LocalTime endTime, LocalTime reminderTime, LocalDate date) {
+		OnlyOccurance occurance = new OnlyOccurance();
+		occurance.setDate(date);
+		occurance.setEndTime(endTime);
+		occurance.setStartTime(startTime);
+		occurance.setReminderTime(reminderTime);
 		return occurance;
 	}
 

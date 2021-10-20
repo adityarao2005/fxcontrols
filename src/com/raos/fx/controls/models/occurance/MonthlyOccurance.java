@@ -42,7 +42,7 @@ public final class MonthlyOccurance extends Occurance {
 	 */
 	public static MonthlyOccurance monthlyOccurance(LocalTime startTime, LocalTime endTime, Collection<Integer> days,
 			LocalDate start, LocalDate end) {
-		return monthlyOccurance(startTime, endTime, days, start, end, Collections.emptyList());
+		return monthlyOccurance(startTime, endTime, days, start, end, Collections.emptyList(), LocalTime.MIN);
 	}
 
 	/**
@@ -53,10 +53,11 @@ public final class MonthlyOccurance extends Occurance {
 	 * @param start - the start date
 	 * @param end - the end date
 	 * @param excludes - the excluded days
+	 * @param reminderTime - the reminder time
 	 * @return an instance of the MonthlyOccurance class
 	 */
 	public static MonthlyOccurance monthlyOccurance(LocalTime startTime, LocalTime endTime, Collection<Integer> days,
-			LocalDate start, LocalDate end, Collection<LocalDate> excludes) {
+			LocalDate start, LocalDate end, Collection<LocalDate> excludes, LocalTime reminderTime) {
 		MonthlyOccurance occurance = new MonthlyOccurance();
 		occurance.setStartTime(startTime);
 		occurance.setEndTime(endTime);
@@ -64,6 +65,7 @@ public final class MonthlyOccurance extends Occurance {
 		occurance.setEndDay(end);
 		occurance.setDays(days);
 		occurance.setExcludes(excludes);
+		occurance.setReminderTime(reminderTime);
 		return occurance;
 	}
 

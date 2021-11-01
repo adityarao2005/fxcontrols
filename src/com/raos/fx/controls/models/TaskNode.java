@@ -17,6 +17,7 @@ import javafx.scene.layout.AnchorPane;
 
 /**
  * The node representation of a Task
+ * 
  * @author Raos
  *
  */
@@ -29,7 +30,7 @@ public class TaskNode extends AnchorPane implements Initializable {
 
 	/**
 	 * @param scheduler - The skin of the Scheduler
-	 * @param task - The task to be represented
+	 * @param task      - The task to be represented
 	 */
 	public TaskNode(SchedulerSkin scheduler, Task task) {
 		// setting the objects
@@ -49,8 +50,10 @@ public class TaskNode extends AnchorPane implements Initializable {
 		// The style class of this node
 		this.getStyleClass().add("task");
 		// action onclick
-		this.setOnMouseClicked(e -> scheduler.getSkinnable()
-				.fireEvent(new TaskSelectedEvent(scheduler, scheduler.getSkinnable(), task)));
+		this.setOnMouseClicked(e -> {
+			scheduler.getSkinnable().fireEvent(new TaskSelectedEvent(scheduler, scheduler.getSkinnable(), task));
+			e.consume();
+		});
 	}
 
 	@Override
@@ -74,7 +77,7 @@ public class TaskNode extends AnchorPane implements Initializable {
 
 			// returns the node
 			return node;
-		// transform it to an array
+			// transform it to an array
 		}).toArray(TaskNode[]::new));
 	}
 

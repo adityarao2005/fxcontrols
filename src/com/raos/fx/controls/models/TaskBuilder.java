@@ -1,9 +1,13 @@
 package com.raos.fx.controls.models;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import com.raos.fx.controls.models.occurance.Occurance;
+
+import javafx.collections.FXCollections;
 
 /**
  * Builds the task according
@@ -65,6 +69,11 @@ public class TaskBuilder<T extends Task> implements Builder<T> {
 	 */
 	public TaskBuilder<T> subTasks(SubTask... subTasks) {
 		this.subTasks = Arrays.asList(subTasks);
+		return this;
+	}
+	
+	public TaskBuilder<T> subTasks(Collection<SubTask> subTasks) {
+		this.subTasks = FXCollections.observableArrayList(subTasks);
 		return this;
 	}
 

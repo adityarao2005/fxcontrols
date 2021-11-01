@@ -3,7 +3,6 @@ package com.raos.fx.controls.models;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 import com.raos.fx.controls.models.occurance.Occurance;
 

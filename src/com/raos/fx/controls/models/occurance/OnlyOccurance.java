@@ -5,6 +5,8 @@ import java.time.LocalTime;
 import java.util.Map;
 import java.util.Objects;
 
+import com.raos.fx.controls.models.Transformable;
+
 /**
  * A class representing an only occurance for a task
  * @author Raos
@@ -108,9 +110,15 @@ public final class OnlyOccurance extends Occurance {
 	}
 
 	@Override
-	public Map<String, Object> transform(Map<String, Object> t) {
-		Map<String, Object> map = super.transform(t);
+	public Map<String, Object> transformTo(Map<String, Object> t) {
+		Map<String, Object> map = super.transformTo(t);
 		map.put("Date", date);
 		return map;
+	}
+	
+	@Override
+	public Transformable<Map<String, Object>> transformFrom(Map<String, Object> t) {
+		date = (LocalDate) t.get("Date");
+		return super.transformFrom(t);
 	}
 }

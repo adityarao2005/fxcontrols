@@ -22,8 +22,4 @@ public class SubTaskBuilder<T extends SubTask> extends TaskBuilder<T> {
 		return new SubTaskBuilder<>(SubTask.class);
 	}
 
-	public static SubTask transformFrom(Task task) {
-		return SubTaskBuilder.create().name(task.getName()).description(task.getDescription())
-				.occurance(task.getOccurance()).priority(task.getPriority()).subTasks(task.getSubTasks()).build();
-	}
 }

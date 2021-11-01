@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
+import com.raos.fx.controls.models.Transformable;
+
 /**
  * The class which represents a Daily Occurance
  * @author Raos
@@ -139,11 +141,22 @@ public final class DailyOccurance extends Occurance {
 	}
 	
 	@Override
-	public Map<String, Object> transform(Map<String, Object> t) {
-		Map<String, Object> map = super.transform(t);
+	public Map<String, Object> transformTo(Map<String, Object> t) {
+		Map<String, Object> map = super.transformTo(t);
 		map.put("Start Date", startDay);
 		map.put("End Date", endDay);
 		map.put("Excludes", excludes);
 		return map;
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Transformable<Map<String, Object>> transformFrom(Map<String, Object> t) {
+		startDay = (LocalDate) t.get("Start Date");
+		endDay = (LocalDate) t.get("End Date");
+		excludes = (Collection<LocalDate>) t.get("Excludes");
+		return super.transformFrom(t);
+	}
+
+	
 }

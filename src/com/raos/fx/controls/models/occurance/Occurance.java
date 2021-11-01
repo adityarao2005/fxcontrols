@@ -141,7 +141,7 @@ public abstract class Occurance implements Transformable<Map<String, Object>> {
 	public abstract boolean isAvailable(LocalDate date);
 	
 	@Override
-	public Map<String, Object> transform(Map<String, Object> t) {
+	public Map<String, Object> transformTo(Map<String, Object> t) {
 		Map<String, Object> map = Optional.ofNullable(t).orElseGet(HashMap::new);
 		map.put("Name", "Occurance");
 		map.put("Start Time", converter.toString(startTime));
@@ -149,6 +149,15 @@ public abstract class Occurance implements Transformable<Map<String, Object>> {
 		map.put("Reminder Time", converter.toString(reminderTime));
 		return map;
 	}
+
+	@Override
+	public Transformable<Map<String, Object>> transformFrom(Map<String, Object> t) {
+		startTime = converter.fromString(t.get("Start Time").toString());
+		endTime = converter.fromString(t.get("End Time").toString());
+		reminderTime = converter.fromString(t.get("Reminder Time").toString());
+		return this;
+	}
+
 }
 
 

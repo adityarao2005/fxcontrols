@@ -142,15 +142,27 @@ public class Task implements Transformable<Map<String, Object>> {
 	 * Transforms to a {@link Map} object
 	 */
 	@Override
-	public Map<String, Object> transform(
+	public Map<String, Object> transformTo(
 			Map<String, Object> list) {
 		Map<String, Object> map = Optional.ofNullable(list).orElseGet(HashMap::new);
 		map.put("Name", name);
 		map.put("Description", description);
 		map.put("Priority", priority);
-		map.put("Occurance", occurance.transform(null));
-		map.put("Sub Tasks", subTasks.stream().map(e -> e.transform(null)).collect(Collectors.toList()));
+		map.put("Occurance", occurance.transformTo(null));
+		map.put("Sub Tasks", subTasks.stream().map(e -> e.transformTo(null)).collect(Collectors.toList()));
 		return map;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Transformable<Map<String, Object>> transformFrom(Map<String, Object> t) {
+		name = (String) t.get("Name");
+		description = (String) t.get("Description");
+		priority = (Priority) t.get("Priority");
+		occurance.transformFrom((Map<String, Object>) t.get("Occurance"));
+		subTasks.clear();
+		subTasks.addAll((List<SubTask>) t.get("Sub Tasks"));
+		return this;
 	}
 
 	@Override

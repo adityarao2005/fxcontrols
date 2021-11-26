@@ -13,6 +13,7 @@ import com.raos.fx.controls.models.Transformable;
 
 /**
  * A class representing a weekly occurance of a task
+ * 
  * @author Raos
  *
  */
@@ -26,8 +27,8 @@ public final class WeeklyOccurance extends Occurance {
 
 	/**
 	 * 
-	 * @param startTime - the start time
-	 * @param endTime - the end time
+	 * @param startTime  - the start time
+	 * @param endTime    - the end time
 	 * @param daysOfWeek - the days of the week
 	 * @return an instance of WeeklyOccurance
 	 */
@@ -38,11 +39,11 @@ public final class WeeklyOccurance extends Occurance {
 
 	/**
 	 * 
-	 * @param startTime - the start time
-	 * @param endTime - the end time
+	 * @param startTime  - the start time
+	 * @param endTime    - the end time
 	 * @param daysOfWeek - the days of the week
-	 * @param start - the start day
-	 * @param end - the end day
+	 * @param start      - the start day
+	 * @param end        - the end day
 	 * @return an instance of WeeklyOccurance
 	 */
 	public static WeeklyOccurance weeklyOccurance(LocalTime startTime, LocalTime endTime, EnumSet<DayOfWeek> daysOfWeek,
@@ -52,12 +53,12 @@ public final class WeeklyOccurance extends Occurance {
 
 	/**
 	 * 
-	 * @param startTime - the start time
-	 * @param endTime - the end time
-	 * @param daysOfWeek - the days of the week
-	 * @param start - the start day
-	 * @param end - the end day
-	 * @param excludes - the excluded days
+	 * @param startTime    - the start time
+	 * @param endTime      - the end time
+	 * @param daysOfWeek   - the days of the week
+	 * @param start        - the start day
+	 * @param end          - the end day
+	 * @param excludes     - the excluded days
 	 * @param reminderTime - the reminder time
 	 * @return an instance of WeeklyOccurance
 	 */
@@ -170,7 +171,7 @@ public final class WeeklyOccurance extends Occurance {
 		return !excludes.contains(date) && !startDay.isAfter(date) && !endDay.isBefore(date)
 				&& daysOfWeek.contains(date.getDayOfWeek());
 	}
-	
+
 	@Override
 	public Map<String, Object> transformTo(Map<String, Object> t) {
 		Map<String, Object> map = super.transformTo(t);
@@ -180,7 +181,7 @@ public final class WeeklyOccurance extends Occurance {
 		map.put("Days of the Week", daysOfWeek);
 		return map;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public Transformable<Map<String, Object>> transformFrom(Map<String, Object> t) {

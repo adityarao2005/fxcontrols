@@ -12,6 +12,7 @@ import com.raos.fx.controls.skin.SchedulerSkin;
 
 import javafx.beans.property.ListPropertyBase;
 import javafx.collections.FXCollections;
+import javafx.util.Callback;
 
 /**
  * Tasks or the event for the Scheduler. Designed to incorporate the basic things of a task
@@ -29,7 +30,7 @@ import javafx.collections.FXCollections;
  *
  * @author Raos
  */
-public class Task implements Transformable<Map<String, Object>> {
+public class Task extends Model implements Transformable<Map<String, Object>> {
 	private String name, description;
 	private Occurance occurance;
 	private Priority priority;
@@ -149,6 +150,7 @@ public class Task implements Transformable<Map<String, Object>> {
 		map.put("Description", description);
 		map.put("Priority", priority);
 		map.put("Occurance", occurance.transformTo(null));
+		map.put("Callback", (Callback<Map<String, Object>, Transformable<Map<String, Object>>>) this::transformFrom);
 		map.put("Sub Tasks", subTasks.stream().map(e -> e.transformTo(null)).collect(Collectors.toList()));
 		return map;
 	}

@@ -12,7 +12,9 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.stream.IntStream;
 
+import com.raos.fx.controls.Invalidateable;
 import com.raos.fx.controls.Scheduler;
+import com.raos.fx.controls.Scheduler.Change;
 import com.raos.fx.controls.models.SubTask;
 import com.raos.fx.controls.models.Task;
 
@@ -38,7 +40,7 @@ import javafx.util.converter.LocalTimeStringConverter;
  * @author Raos
  *
  */
-public class SchedulerSkin extends FXRootSkinBase<Scheduler, ScrollPane> {
+public class SchedulerSkin extends FXRootSkinBase<Scheduler, ScrollPane> implements Invalidateable {
 	@FXML
 	private GridPane gridPane;
 	@FXML
@@ -70,6 +72,10 @@ public class SchedulerSkin extends FXRootSkinBase<Scheduler, ScrollPane> {
 	 */
 	public Pair<Integer, Integer> getAtIndex(LocalTime lt) {
 		return indeces.get(lt);
+	}
+
+	private void refresh() {
+		this.displayTasks(Scheduler.getTaskFactory().call(this.getSkinnable().getCurrentLocalDate()));
 	}
 
 	// Displays the tasks
@@ -130,22 +136,49 @@ public class SchedulerSkin extends FXRootSkinBase<Scheduler, ScrollPane> {
 			AnchorPane anchorPane = new AnchorPane();
 			Label label = new Label(time);
 			label.setAlignment(Pos.CENTER);
+			
 			AnchorPane.setBottomAnchor(label, Double.valueOf(0));
 			AnchorPane.setLeftAnchor(label, Double.valueOf(0));
 			AnchorPane.setTopAnchor(label, Double.valueOf(0));
 			AnchorPane.setRightAnchor(label, Double.valueOf(0));
 			anchorPane.getChildren().add(label);
+			
 			gridPane.add(anchorPane, 0, i * (factor + 1) + 4, 1, factor);
 
 			gridPane.getRowConstraints().add(new RowConstraints());
 
-			// Add a separator at the end of the hour in the 
+			// Add a separator at the end of the hour in the
 			gridPane.add(new Separator(Orientation.HORIZONTAL), 0, i * (factor + 1) + factor + 4,
 					gridPane.getColumnConstraints().size(), 1);
 
 		}
 
 		gridPane.add(new Separator(Orientation.VERTICAL), 1, 0, 1, gridPane.getRowConstraints().size());
+	}
+
+	@Override
+	public void invalidate(Object obj) {
+		@SuppressWarnings("unchecked")
+		Change<Task> change = (Change<Task>) obj;
+		switch (change.getChanged()) {
+		case ADDED:
+			if (change.added().stream()
+					.filter(e -> e.getOccurance().isAvailable(this.getSkinnable().getCurrentLocalDate())).count() > 0)
+				refresh();
+			break;
+		case REMOVED:
+			if (change.removed().stream()
+					.filter(e -> e.getOccurance().isAvailable(this.getSkinnable().getCurrentLocalDate())).count() > 0)
+				refresh();
+			break;
+		case UPDATED:
+			if (change.updated().getValue().getOccurance().isAvailable(this.getSkinnable().getCurrentLocalDate()))
+				refresh();
+			break;
+		default:
+			break;
+
+		}
 	}
 
 }

@@ -11,15 +11,18 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.raos.fx.controls.models.Model;
 import com.raos.fx.controls.models.Transformable;
 
+import javafx.util.Callback;
 import javafx.util.converter.LocalTimeStringConverter;
 
 /**
  * The Occurance of a Task which includes time duration
+ * 
  * @author Raos
  */
-public abstract class Occurance implements Transformable<Map<String, Object>> {
+public abstract class Occurance extends Model implements Transformable<Map<String, Object>> {
 	/**
 	 * MAX and MIN of Time represented in the Scheduler
 	 */
@@ -64,12 +67,13 @@ public abstract class Occurance implements Transformable<Map<String, Object>> {
 
 	/**
 	 * The Enum of how often an occurance is
+	 * 
 	 * @author Raos
 	 */
 	public static enum Often {
-		ONCE, DAILY, WEEKLY, MONTHLY, YEARLY	
+		ONCE, DAILY, WEEKLY, MONTHLY, YEARLY
 	}
-	
+
 	/**
 	 * @return the time duration
 	 */
@@ -98,6 +102,7 @@ public abstract class Occurance implements Transformable<Map<String, Object>> {
 
 	/**
 	 * Checks if an this intersects with another occurance
+	 * 
 	 * @param other - the other occurance
 	 * @return whether it intersects or not
 	 */
@@ -105,7 +110,8 @@ public abstract class Occurance implements Transformable<Map<String, Object>> {
 		if (other == null) {
 			throw new NullPointerException("other cannot be null");
 		}
-		// check if it equal to the other or it starts before the end and ends after the begining
+		// check if it equal to the other or it starts before the end and ends after the
+		// begining
 		if (this.equals(other) || this == other) {
 			return true;
 		}
@@ -135,11 +141,12 @@ public abstract class Occurance implements Transformable<Map<String, Object>> {
 
 	/**
 	 * Checks if it is available on this day
+	 * 
 	 * @param date - the date it is available on
 	 * @return
 	 */
 	public abstract boolean isAvailable(LocalDate date);
-	
+
 	@Override
 	public Map<String, Object> transformTo(Map<String, Object> t) {
 		Map<String, Object> map = Optional.ofNullable(t).orElseGet(HashMap::new);
@@ -147,6 +154,7 @@ public abstract class Occurance implements Transformable<Map<String, Object>> {
 		map.put("Start Time", converter.toString(startTime));
 		map.put("End Time", converter.toString(endTime));
 		map.put("Reminder Time", converter.toString(reminderTime));
+		map.put("Callback", (Callback<Map<String, Object>, Transformable<Map<String, Object>>>) this::transformFrom);
 		return map;
 	}
 
@@ -158,6 +166,5 @@ public abstract class Occurance implements Transformable<Map<String, Object>> {
 		return this;
 	}
 
+
 }
-
-

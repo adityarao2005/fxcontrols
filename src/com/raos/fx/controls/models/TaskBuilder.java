@@ -79,6 +79,11 @@ public class TaskBuilder<T extends Task> implements Builder<T> {
 	@Override
 	public T build() {
 		T task = this.construct(clazz);
+		applyTo(task);
+		return task;
+	}
+	
+	public void applyTo(Task task) {
 		if (name != null) {
 			task.setName(name);
 		}
@@ -94,7 +99,6 @@ public class TaskBuilder<T extends Task> implements Builder<T> {
 		if (subTasks != null) {
 			task.getSubTasks().addAll(subTasks);
 		}
-		return task;
 	}
 
 	public static TaskBuilder<? extends Task> create() {

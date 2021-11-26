@@ -10,10 +10,13 @@ import java.util.List;
 
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.Control;
@@ -35,6 +38,8 @@ public class Scheduler extends Control {
 	 * The default factory callback to retrieve the tasks
 	 */
 	public static final Callback<LocalDate, ReadOnlyListProperty<Task>> DEFAULT_TASK_FACTORY = MemoryContainer::taskFactory;
+
+	private static final List<Scheduler> SCHEDULERS = FXCollections.observableArrayList();
 
 	/**
 	 * The current local date that is used for the Scheduler
@@ -83,7 +88,32 @@ public class Scheduler extends Control {
 	}
 
 	public static void setTaskModFactory(Callback<Change<Task>, Boolean> value) {
-		taskModFactory.set(value);
+		// proxy callback
+		taskModFactory.set(e -> {
+			try {
+				// call value then execute change
+				return value.call(e);
+			} finally {
+				// execute ui change
+				Scheduler.SCHEDULERS.forEach(e0 -> {
+					if (e0.getSkin() != null)
+						// refresh skin
+						((Invalidateable) e0.getSkin()).invalidate(e);
+					else {
+						// add listener to skin property to invalidate on skin change
+						e0.skinProperty().addListener(new InvalidationListener() {
+							@Override
+							public void invalidated(Observable o) {
+								((Invalidateable) e0.getSkin()).invalidate(e);
+								e0.skinProperty().removeListener(this);
+							}
+
+						});
+					}
+
+				});
+			}
+		});
 	}
 
 	private final static ObjectProperty<Callback<Change<Task>, Boolean>> taskModFactory = new SimpleObjectProperty<>(
@@ -93,7 +123,7 @@ public class Scheduler extends Control {
 	 * The constructor for the Scheduler object
 	 */
 	public Scheduler() {
-
+		SCHEDULERS.add(this);
 	}
 
 	/**
@@ -101,6 +131,11 @@ public class Scheduler extends Control {
 	 */
 	@Override
 	protected Skin<?> createDefaultSkin() {
+		skinProperty().addListener((obs, oldv, newv) -> {
+			if (newv instanceof Invalidateable)
+				return;
+			throw new RuntimeException("The Skin of the scheduler must be Invalidateable");
+		});
 		return new SchedulerSkin(this);
 	}
 
@@ -116,7 +151,9 @@ public class Scheduler extends Control {
 	}
 
 	public final void setOnTaskSelected(final EventHandler<TaskSelectedEvent> onTaskSelected) {
-		this.onTaskSelectedProperty().set(onTaskSelected);
+		this.onTaskSelectedProperty().set(e -> {
+			onTaskSelected.handle(e);
+		});
 	}
 
 	private final ObjectProperty<EventHandler<TaskSelectedEvent>> onTaskSelected = new ObjectPropertyBase<EventHandler<TaskSelectedEvent>>() {
@@ -139,8 +176,19 @@ public class Scheduler extends Control {
 	private static class MemoryContainer {
 
 		// Total amount tasks
-		private static final ObservableList<Task> tasks = FXCollections
-				.synchronizedObservableList(FXCollections.observableArrayList());
+		private static final ObservableList<Task> tasks = FXCollections.observableArrayList();
+		private static int index = 0;
+
+		static {
+			tasks.addListener((ListChangeListener<Task>) c -> {
+				if (c.wasAdded()) {
+					for (Task task : c.getAddedSubList()) {
+						task.persist(index);
+						index++;
+					}
+				}
+			});
+		}
 
 		// The default task factory
 		private static ReadOnlyListProperty<Task> taskFactory(LocalDate date) {
@@ -148,15 +196,16 @@ public class Scheduler extends Control {
 			return new ReadOnlyListWrapper<Task>(MemoryContainer.class, "tasks",
 					// filtering the tasks to the date
 					tasks.stream().filter(e -> e.getOccurance().isAvailable(date))
-						// collecting the stream to an observable array list from FXCollections
-						.collect(FXCollections::observableArrayList, Collection::add, Collection::addAll))
-							// getting the readonly property from the wrapper
-							.getReadOnlyProperty();
+							// collecting the stream to an observable array list from FXCollections
+							.collect(FXCollections::observableArrayList, Collection::add, Collection::addAll))
+									// getting the readonly property from the wrapper
+									.getReadOnlyProperty();
 		}
 
 		// The default task modification factory
 		private static boolean taskModFactory(Change<Task> change) {
 			// switch case of the change event
+
 			switch (change.getChanged()) {
 			// adds the added list to the total tasks
 			case ADDED:
@@ -168,6 +217,7 @@ public class Scheduler extends Control {
 			case UPDATED:
 				boolean b = true;
 				try {
+					change.updated().getValue().persist(change.updated().getKey().getId());
 					tasks.set(tasks.indexOf(change.updated().getKey()), change.updated().getValue());
 				} catch (Exception e) {
 					b = false;
@@ -180,6 +230,7 @@ public class Scheduler extends Control {
 
 	/**
 	 * The change class that can hold changed items for the scheduler
+	 * 
 	 * @author Raos
 	 *
 	 * @param <E> - Changed class
@@ -192,7 +243,7 @@ public class Scheduler extends Control {
 
 		/**
 		 * 
-		 * @param <E> - Changed class
+		 * @param <E>   - Changed class
 		 * @param added - List of Elements to be added to Scheduler tasks
 		 * @return the change object
 		 */
@@ -206,7 +257,7 @@ public class Scheduler extends Control {
 				}
 
 			};
-			//set the added as an unmodifiable list
+			// set the added as an unmodifiable list
 			change.added = Collections.unmodifiableList(added);
 			return change;
 		}
@@ -221,7 +272,7 @@ public class Scheduler extends Control {
 				}
 
 			};
-			//set the removed as an unmodifiable list
+			// set the removed as an unmodifiable list
 			change.removed = Collections.unmodifiableList(removed);
 			return change;
 		}
@@ -275,6 +326,7 @@ public class Scheduler extends Control {
 
 		/**
 		 * The Change event
+		 * 
 		 * @author Raos
 		 *
 		 */
